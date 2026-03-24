@@ -33,10 +33,12 @@ on:
     branches: [ "**" ]
   pull_request:
     branches: [ "master" ]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
-  pull-requests: read # allows SonarCloud to decorate PRs with analysis results
+  pull-requests: write
+  contents: read
 
 jobs:
   sonar-check:

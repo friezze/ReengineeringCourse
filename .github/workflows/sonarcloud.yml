@@ -54,6 +54,8 @@ jobs:
 
       # 1) BEGIN: SonarScanner for .NET
       - name: SonarScanner Begin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dotnet tool install --global dotnet-sonarscanner
           echo "$env:USERPROFILE\.dotnet\tools" >> $env:GITHUB_PATH
@@ -85,5 +87,7 @@ jobs:
 
       # 3) END: SonarScanner
       - name: SonarScanner End
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         shell: pwsh

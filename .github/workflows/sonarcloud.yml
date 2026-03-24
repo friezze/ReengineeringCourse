@@ -62,6 +62,7 @@ jobs:
           dotnet sonarscanner begin `
           /k:"ppanchen_NetSdrClient" `
           /o:"ppanchen" `
+          /d:sonar.host.url="https://sonarcloud.io" `
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
           /d:sonar.cs.opencover.reportsPaths="**/coverage.xml" `
           /d:sonar.cpd.cs.minimumTokens=40 `

@@ -57,7 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          dotnet tool install --global dotnet-sonarscanner --version 5.15.0
+          dotnet tool install --global dotnet-sonarscanner --version 6.2.0
           echo "$env:USERPROFILE\.dotnet\tools" >> $env:GITHUB_PATH
           dotnet sonarscanner begin `
           /k:"ppanchen_NetSdrClient" `

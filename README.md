@@ -54,6 +54,10 @@ https://github.com/friezze/ReengineeringCourse/commit/2534516c319a38d4aecd5d70a4
 
 ![alt text](image-10.png)
 
+Після виправлення
+
+![alt text](image-11.png)
+
 
 
 Цей репозиторій використовується для курсу **реінжиніринг ПЗ**. 

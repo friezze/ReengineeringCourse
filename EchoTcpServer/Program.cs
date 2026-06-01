@@ -1,66 +1,91 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-/// <summary>
-/// This program was designed for test purposes only
-/// Not for a review
-/// </summary>
+public interface ITcpListenerWrapper
+{
+    void Start();
+    void Stop();
+    Task<ITcpClientWrapper> AcceptTcpClientAsync();
+}
+
+public interface ITcpClientWrapper : IDisposable
+{
+    Stream GetStream();
+    void Close();
+}
+
+public class TcpListenerWrapper : ITcpListenerWrapper
+{
+    private readonly TcpListener _listener;
+    public TcpListenerWrapper(IPAddress localaddr, int port) { _listener = new TcpListener(localaddr, port); }
+    public void Start() => _listener.Start();
+    public void Stop() => _listener.Stop();
+    public async Task<ITcpClientWrapper> AcceptTcpClientAsync() => new TcpClientWrapper(await _listener.AcceptTcpClientAsync());
+}
+
+public class TcpClientWrapper : ITcpClientWrapper
+{
+    private readonly TcpClient _client;
+    public TcpClientWrapper(TcpClient client) { _client = client; }
+    public Stream GetStream() => _client.GetStream();
+    public void Close() => _client.Close();
+    public void Dispose() => _client.Dispose();
+}
+
 public class EchoServer
 {
-    private readonly int _port;
-    private TcpListener _listener;
+    private readonly ITcpListenerWrapper _listener;
     private CancellationTokenSource _cancellationTokenSource;
 
-
-    public EchoServer(int port)
+    public EchoServer(ITcpListenerWrapper listener)
     {
-        _port = port;
+        _listener = listener;
         _cancellationTokenSource = new CancellationTokenSource();
     }
 
     public async Task StartAsync()
     {
-        _listener = new TcpListener(IPAddress.Any, _port);
         _listener.Start();
-        Console.WriteLine($"Server started on port {_port}.");
+        Console.WriteLine("Server started.");
 
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
             try
             {
-                TcpClient client = await _listener.AcceptTcpClientAsync();
+                ITcpClientWrapper client = await _listener.AcceptTcpClientAsync();
                 Console.WriteLine("Client connected.");
 
                 _ = Task.Run(() => HandleClientAsync(client, _cancellationTokenSource.Token));
             }
-            catch (ObjectDisposedException)
+            catch (Exception ex) when (ex is ObjectDisposedException || ex is OperationCanceledException)
             {
-                // Listener has been closed
                 break;
             }
         }
-
         Console.WriteLine("Server shutdown.");
     }
 
-    private async Task HandleClientAsync(TcpClient client, CancellationToken token)
+    public async Task HandleClientAsync(ITcpClientWrapper client, CancellationToken token)
     {
-        using (NetworkStream stream = client.GetStream())
+        using (client)
         {
             try
             {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-
-                while (!token.IsCancellationRequested && (bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                using (Stream stream = client.GetStream())
                 {
-                    // Echo back the received message
-                    await stream.WriteAsync(buffer, 0, bytesRead, token);
-                    Console.WriteLine($"Echoed {bytesRead} bytes to the client.");
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+
+                    while (!token.IsCancellationRequested && (bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                    {
+                        await stream.WriteAsync(buffer, 0, bytesRead, token);
+                        Console.WriteLine($"Echoed {bytesRead} bytes to the client.");
+                    }
                 }
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
@@ -82,17 +107,20 @@ public class EchoServer
         _cancellationTokenSource.Dispose();
         Console.WriteLine("Server stopped.");
     }
+}
 
+public class Program
+{
     public static async Task Main(string[] args)
     {
-        EchoServer server = new EchoServer(5000);
+        var listener = new TcpListenerWrapper(IPAddress.Any, 5000);
+        EchoServer server = new EchoServer(listener);
 
-        // Start the server in a separate task
         _ = Task.Run(() => server.StartAsync());
 
-        string host = "127.0.0.1"; // Target IP
-        int port = 60000;          // Target Port
-        int intervalMilliseconds = 5000; // Send every 3 seconds
+        string host = "127.0.0.1"; 
+        int port = 60000;          
+        int intervalMilliseconds = 5000; 
 
         using (var sender = new UdpTimedSender(host, port))
         {
@@ -102,7 +130,6 @@ public class EchoServer
             Console.WriteLine("Press 'q' to quit...");
             while (Console.ReadKey(intercept: true).Key != ConsoleKey.Q)
             {
-                // Just wait until 'q' is pressed
             }
 
             sender.StopSending();
@@ -111,7 +138,6 @@ public class EchoServer
         }
     }
 }
-
 
 public class UdpTimedSender : IDisposable
 {
@@ -141,7 +167,6 @@ public class UdpTimedSender : IDisposable
     {
         try
         {
-            //dummy data
             Random rnd = new Random();
             byte[] samples = new byte[1024];
             rnd.NextBytes(samples);

@@ -48,7 +48,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
       - name: SonarScanner Begin
         run: |          
@@ -61,7 +61,7 @@ jobs:
           /d:sonar.cs.opencover.reportsPaths="**/coverage.xml" `          
           /d:sonar.cpd.cs.minimumTokens=40 `          
           /d:sonar.cpd.cs.minimumLines=5 `          
-          /d:sonar.exclusions=**/bin/**,**/obj/**,**/sonarcloud.yml `          
+          /d:sonar.exclusions="**/bin/**,**/obj/**,**/sonarcloud.yml" `          
           /d:sonar.qualitygate.wait=true        
         shell: pwsh
         

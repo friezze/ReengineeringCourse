@@ -119,6 +119,9 @@ public class NetSdrClientTests
     [Test]
     public async Task StartIQAsync_CalledTwice_ExecutesTwice()
     {
+        // Arrange
+        await ConnectAsyncTest();
+
         // Act
         await _client.StartIQAsync();
         await _client.StartIQAsync();
@@ -130,6 +133,9 @@ public class NetSdrClientTests
     [Test]
     public async Task StopIQAsync_CalledTwice_ExecutesTwice()
     {
+        // Arrange
+        await ConnectAsyncTest();
+
         // Act
         await _client.StopIQAsync();
         await _client.StopIQAsync();

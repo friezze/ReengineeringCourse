@@ -16,6 +16,8 @@ namespace NetSdrClientApp.Messages
         private const short _msgControlItemLength = 2; //2 byte, 16 bit
         private const short _msgSequenceNumberLength = 2; //2 byte, 16 bit
 
+        public NetSdrClientApp.Networking.ITcpClient? BadDependency { get; set; }
+
         public enum MsgTypes
         {
             SetControlItem,

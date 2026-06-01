@@ -116,4 +116,62 @@ public class NetSdrClientTests
     }
 
     //TODO: cover the rest of the NetSdrClient code here
+    [Test]
+    public async Task StartIQAsync_CalledTwice_ExecutesTwice()
+    {
+        // Arrange
+        await ConnectAsyncTest();
+
+        // Act
+        await _client.StartIQAsync();
+        await _client.StartIQAsync();
+
+        // Assert
+        _updMock.Verify(udp => udp.StartListeningAsync(), Times.Exactly(2));
+    }
+
+    [Test]
+    public async Task StopIQAsync_CalledTwice_ExecutesTwice()
+    {
+        // Arrange
+        await ConnectAsyncTest();
+
+        // Act
+        await _client.StopIQAsync();
+        await _client.StopIQAsync();
+
+        // Assert
+        _updMock.Verify(udp => udp.StopListening(), Times.Exactly(2));
+    }
+
+    [Test]
+    public void Disconect_CalledTwice_ExecutesTwice()
+    {
+        // Act
+        _client.Disconect();
+        _client.Disconect();
+
+        // Assert
+        _tcpMock.Verify(tcp => tcp.Disconnect(), Times.Exactly(2));
+    }
+
+    [Test]
+    public async Task StartIQAsync_NeverCalls_TcpDisconnect()
+    {
+        // Act
+        await _client.StartIQAsync();
+
+        // Assert
+        _tcpMock.Verify(tcp => tcp.Disconnect(), Times.Never);
+    }
+
+    [Test]
+    public async Task StopIQAsync_NeverCalls_TcpDisconnect()
+    {
+        // Act
+        await _client.StopIQAsync();
+
+        // Assert
+        _tcpMock.Verify(tcp => tcp.Disconnect(), Times.Never);
+    }
 }

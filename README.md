@@ -9,6 +9,23 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppanchen_NetSdrClient&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ppanchen_NetSdrClient)
 
 
+
+## Тут все пов'язане з виконанням самих лаб
+# 1
+![Чек сонарклауда з форка репозиторія](image.png)
+![Бейджі](image-1.png)
+Лінк на коміт
+'''
+https://github.com/friezze/ReengineeringCourse/commit/2534516c319a38d4aecd5d70a4e93c086961300
+'''
+
+# 2
+
+До змін
+![alt text](image-2.png)
+Після
+
+
 Цей репозиторій використовується для курсу **реінжиніринг ПЗ**. 
 Мета — провести комплексний реінжиніринг спадкового коду NetSdrClient, включаючи рефакторинг архітектури, покращення якості коду, впровадження сучасних практик розробки та автоматизацію процесів контролю якості через CI/CD пайплайни.
 

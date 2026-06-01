@@ -51,18 +51,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: SonarScanner Begin
-        run: |          
-          dotnet tool install --global dotnet-sonarscanner          
-          echo "$env:USERPROFILE\.dotnet\tools" >> $env:GITHUB_PATH          
-          dotnet sonarscanner begin `          
-          /d:sonar.projectKey="friezze_ReengineeringCourse" `          
-          /d:sonar.organization="friezze" `          
-          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `          
-          /d:sonar.cs.opencover.reportsPaths="**/coverage.xml" `          
-          /d:sonar.cpd.cs.minimumTokens=40 `          
-          /d:sonar.cpd.cs.minimumLines=5 `          
-          /d:sonar.exclusions="**/bin/**,**/obj/**,**/sonarcloud.yml" `          
-          /d:sonar.qualitygate.wait=true        
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          echo "$env:USERPROFILE\.dotnet\tools" >> $env:GITHUB_PATH
+          dotnet sonarscanner begin /k:"friezze_ReengineeringCourse" /o:"friezze" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths="**/coverage.xml" /d:sonar.cpd.cs.minimumTokens=40 /d:sonar.cpd.cs.minimumLines=5 /d:sonar.exclusions="**/bin/**,**/obj/**,**/sonarcloud.yml" /d:sonar.qualitygate.wait=true     
         shell: pwsh
         
       - name: Restore
